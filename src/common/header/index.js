@@ -18,16 +18,24 @@ import {
 } from './style'
 
 class Header extends Component{
-	getListArea=(show)=>{
-		if(show){
+	getListArea=(focused)=>{
+		const {list,page,handleEnter,handleLeave,mouseIn,handleChangePage,totalPage}=this.props;
+		const newList=list.toJS(list);
+		const pageList=[];
+		for(let i=page*10;i<(page+1)*10;i++){
+			if(i>=newList.length) break;
+			pageList.push(<SearchInfoItem key={newList[i]}>{newList[i]}</SearchInfoItem>)
+		}
+		if(focused||mouseIn){
 			return(
-				<SearchInfo >
+				<SearchInfo onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
 					<SearchInfoTitle>热门搜索</SearchInfoTitle>
-					<SearchInfoSwitch>换一换</SearchInfoSwitch>
+					<SearchInfoSwitch onClick={()=>handleChangePage(totalPage,page,this.spinIcon)}>
+						<i ref={(icon)=>{this.spinIcon=icon}} className={'iconfont spin'}>&#xe851;</i>
+						换一换
+					</SearchInfoSwitch>
 					<div>
-						{this.props.list.map((item)=>{
-							return <SearchInfoItem key={item}>{item}</SearchInfoItem>
-						})}
+						{pageList}
 					</div>
 				</SearchInfo>
 			);
@@ -37,6 +45,7 @@ class Header extends Component{
 		}
 	};
 	render(){
+		const {focused,handleInputFocus,handleInputBlur,list}=this.props;
 		return(
 			<HeaderWrapper>
 				<Logo href={'/'}/>
@@ -48,13 +57,13 @@ class Header extends Component{
 					<SearchWrapper>
 						<CSSTransition
 							timeout={200}
-							in={this.props.focused}
+							in={focused}
 							classNames={"slide"}
 						>
-							<Search onFocus={this.props.handleInputFocus} onBlur={this.props.handleInputBlur} className={ this.props.focused ? 'focused':''}/>
+							<Search onFocus={()=>handleInputFocus(list)} onBlur={handleInputBlur} className={focused ? 'focused':''}/>
 						</CSSTransition>
-						<i className={ this.props.focused ? 'focused iconfont':'iconfont'}>&#xe6e4;</i>
-						{this.getListArea(this.props.focused)}
+						<i className={ focused ? 'focused iconfont zoom':'iconfont zoom'}>&#xe6e4;</i>
+						{this.getListArea(focused)}
 					</SearchWrapper>
 				</Nav>
 				<Addition>
@@ -74,19 +83,42 @@ const mapStateToprops=(state)=>{
 	return {
 		//focused:state.getIn(['header','focused'])与下面那句话等价
 		focused:state.get('header').get('focused'),
-		list:state.get('header').get('list')
+		list:state.get('header').get('list'),
+		page:state.getIn(['header','page']),
+		mouseIn:state.getIn(['header','mouseIn']),
+		totalPage:state.getIn(['header','totalPage'])
 	}
 };
 
 const mapDispatchToprops=(dispatch)=>{
 	return {
-		handleInputFocus(){
-			dispatch(actionCreators.getListAction());
+		handleInputFocus(list){
+			(list.size===0)&&dispatch(actionCreators.getListAction());
 			dispatch(actionCreators.handleInputFocusAction())
 		},
 		handleInputBlur(){
 			const action=actionCreators.handleInputBlurAction();
 			dispatch(action)
+		},
+		handleEnter(){
+			dispatch(actionCreators.mouseEnterAction());
+		},
+		handleLeave(){
+			dispatch(actionCreators.mouseLeaveAction());
+		},
+		handleChangePage(totalPage,page,spinIcon) {
+		    let originAngle=spinIcon.style.transform.replace(/[^0-9]/ig,'');
+		    if(originAngle){
+		         originAngle=parseInt(originAngle,10)+360;
+		    }else{
+			    originAngle=360;
+		    }
+			spinIcon.style.transform=`rotate(${originAngle}deg)`;
+			if(page<totalPage-1)
+				dispatch(actionCreators.changePageAction(page+1));
+			else{
+				dispatch(actionCreators.changePageAction(0))
+			}
 		}
 	};
 };
