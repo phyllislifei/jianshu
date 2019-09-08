@@ -51,21 +51,48 @@ export const getListAction=()=>{
     }
 };
 
-export const getArticleList=(data)=>{
+export const getArticleList=(result)=>{
     return{
         type:actionTypes.ARTICLE_LIST,
-        data:data
+        articleList:result.articleList,
+        recommendList:result.recommendList,
+        writerList:result.writerList
     }
 };
 
 export const getArticleListAction=()=>{
     return (dispatch)=>{
         axios.get('/api/homeList.json').then((res)=>{
-            const data=res.data;
-            dispatch(getArticleList(data.data));
+            const result=res.data.data;
+            dispatch(getArticleList(result));
         }).catch(()=>{
             console.log('error');
         })
+    }
+};
+
+const getMoreList=(result)=>{
+    return{
+        type:actionTypes.ARTICLE_LIST_MORE,
+        articleList: result.articleList
+    }
+};
+
+export const getMoreAction=()=>{
+    return (dispatch)=>{
+        axios.get("api/homeListAdd.json").then((res)=>{
+            const result=res.data.data;
+            dispatch(getMoreList(result));
+        }).catch(()=>{
+            console.log("error");
+        })
+    }
+};
+
+export const changeScrollShowAction=(data)=>{
+    return{
+      type:actionTypes.SCROLL_SHOW,
+      data:data
     }
 };
 

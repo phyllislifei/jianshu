@@ -8,7 +8,7 @@ export const HeaderWrapper=styled.div`
         border-bottom:1px solid #f0f0f0;`;
 
 //Logo就是带样式的a标签
-export const Logo=styled.a`
+export const Logo=styled.div`
         width:100px;
         height:56px;
         display:block;

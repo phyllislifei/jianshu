@@ -1,22 +1,21 @@
-import React ,{ Component } from 'react'
+import React ,{ PureComponent } from 'react'
 import {ListInfo,ListItem,ListTitle,ListContent} from './../style'
 import pic from './../../../statics/img/wangjunkai.jpg'
 import {connect } from 'react-redux'
-import * as actionCreators from './../../../actionCreators'
+import {Link} from 'react-router-dom'
 
-class List extends Component{
+class List extends PureComponent{
 	render(){
 	    const {list}=this.props;
 		return(
 			<div>
-				{console.log(list)}
-				{list.map((item)=>{
+				{list.map((item,index)=>{
 				     return(
-					     <ListItem key={item["id"]}>
-						     <img className={"pic"} src={item["imgUrl"]} alt={""}/>
+					     <ListItem key={index}>
+						     <img className={"pic"} src={item.get("imgUrl")} alt={""}/>
 						     <ListInfo>
-							     <ListTitle>{item["title"]}</ListTitle>
-							     <ListContent>{item["content"]}</ListContent>
+							     <Link to={"/detail"}><ListTitle>{item.get("title")}</ListTitle></Link>
+							     <ListContent>{item.get("content")}</ListContent>
 						     </ListInfo>
 						     <div className={"line"}></div>
 					     </ListItem>
@@ -25,17 +24,10 @@ class List extends Component{
 			</div>
 		)
 	}
-	componentDidMount() {
-	   this.props.getList();
-	}
 }
 
 const mapStateToProps=(state)=>({
     list:state.getIn(['home','articleList'])
 });
-const mapDispatchToProps=(dispatch)=>({
-    getList(){
-         dispatch(actionCreators.getArticleListAction())
-    }
-});
-export default connect(mapStateToProps,mapDispatchToProps)(List);
+
+export default connect(mapStateToProps,null)(List);

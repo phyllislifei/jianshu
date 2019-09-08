@@ -5,3 +5,5 @@ export const MOUSE_ENTER='header/mouse-enter';
 export const MOUSE_LEAVE='header/mouse-leave';
 export const CHANGE_PAGE='header/change-page';
 export  const ARTICLE_LIST="home/article-list";
+export const ARTICLE_LIST_MORE="home/article-list-more";
+export const SCROLL_SHOW="home/scroll-show";
